@@ -2,10 +2,10 @@ import RPi.GPIO as gpio
 import time
 
 READ_PULSE_TIMEOUT = 0xFFFFFFFF
-def readPulse(pin, target, timeout):
+def readPulse(pin, timeout):
     
-    if gpio.input(pin) != target:    
-        edgeDetected = gpio.wait_for_edge(pin, 31 + int(not target), timeout=timeout)
+    if gpio.input(pin) != gpio.HIGH:    
+        edgeDetected = gpio.wait_for_edge(pin, gpio.RISING, timeout=timeout)
         
         if edgeDetected is None:
             print("Timed out before pulse start")
@@ -13,7 +13,7 @@ def readPulse(pin, target, timeout):
         
     start = time.time_ns()
         
-    edgeDetected = gpio.wait_for_edge(pin, 31 + int(target), timeout=timeout)
+    edgeDetected = gpio.wait_for_edge(pin, gpio.FALLING, timeout=timeout)
     
     if edgeDetected is None:
         print("Timed out before pulse end")
@@ -53,7 +53,7 @@ try:
         gpio.output(triggerPin, gpio.LOW)
 
         # Determine the length of the pulse returned on the echo pin
-        distance = readPulse(echoPin, gpio.HIGH, 1000)
+        distance = readPulse(echoPin, 1000)
         distance /= (NS_FACTOR / US_FACTOR)
         
         # Normalise into some range
